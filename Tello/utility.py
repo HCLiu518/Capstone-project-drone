@@ -26,26 +26,28 @@ def telloGetFrame(myDrone,w=360,h=240):
 def findFace(img):
 	faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 	imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-	faces = faceCascade.detectMultiScale(imgGray, 1.1, 4)
+	faces, rejectLevels, levelWeights = faceCascade.detectMultiScale3(imgGray, 1.1, 4, outputRejectLevels=True)
 
 	myFacesListC = []
 	myFaceListArea = []
+	myFaceConf = []
 
-	for (x, y, w, h) in faces:
+	for ((x, y, w, h), _, lw) in zip(faces, rejectLevels, levelWeights):
 		cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
 		cx = x + w//2
 		cy = y + h//2
 		area = w*h
 		myFacesListC.append([cx,cy])
 		myFaceListArea.append(area)
+		myFaceConf.append(lw)
 		#print(area)
 
 	if len(myFaceListArea) != 0:
 		i = myFaceListArea.index(max(myFaceListArea))
 		# index of closest face
-		return img,[myFacesListC[i],myFaceListArea[i]]
+		return img,[myFacesListC[i],myFaceListArea[i],myFaceConf[i]]
 	else:
-		return img, [[0,0],0]
+		return img, [[0,0],0,0]
 
 def trackFace(myDrone,c,w,h,area,pid,pError):
 	#print(c)
@@ -71,7 +73,7 @@ def trackFace(myDrone,c,w,h,area,pid,pError):
 	speed_height = pid[0]*error_height + pid[1] * (error_height-pError[2])
 	speed_height = -int(np.clip(speed_height, -100, 100))
 
-	if c[0][0] != 0 and c[1] != 0 and c[0][1] != 0:
+	if c[0][0] != 0 and c[1] != 0 and c[0][1] != 0 and c[2] > 3.5:
 		myDrone.yaw_velocity = speed_rotation
 		myDrone.for_back_velocity = speed_distance
 		myDrone.up_down_velocity = speed_height
