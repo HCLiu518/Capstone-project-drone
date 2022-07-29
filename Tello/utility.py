@@ -105,19 +105,23 @@ def searchFace(myDrone, direction='up'):
 
 	return direction
 
-def reactGest(myDrone, gesture=None, pGest=None, gestCounter=0, myDroneIsTakeOff=True):
+def reactGest(myDrone, mode, gesture=None, pGest=None, gestCounter=0, myDroneIsTakeOff=True):
 	if not gesture:
-		return None, 0, myDroneIsTakeOff
+		return mode, None, 0, myDroneIsTakeOff
 	if pGest == gesture:
 		if gestCounter >= 5:
-			if gesture=="stop" and myDroneIsTakeOff:
+			if gesture=="peace" and myDroneIsTakeOff:
 				myDrone.land()
 				myDroneIsTakeOff = False
-			if (gesture=="fist" or gesture=='thumbs down') and not myDroneIsTakeOff:
+			elif (gesture=="fist" or gesture=='thumbs down') and not myDroneIsTakeOff:
 				myDrone.takeoff()
 				myDroneIsTakeOff = True
-			if gesture == "thumbs up" or gesture=="call me":
+			elif (gesture == "thumbs up" or gesture=="call me") and myDroneIsTakeOff:
 				myDrone.flip_back()
+			elif gesture == "live long" and myDroneIsTakeOff:
+				mode = "tracking"
+			elif gesture == "stop" and myDroneIsTakeOff:
+				mode = "wait"
 			gestCounter = 0
 		else:
 			gestCounter += 1
@@ -125,4 +129,4 @@ def reactGest(myDrone, gesture=None, pGest=None, gestCounter=0, myDroneIsTakeOff
 	else:
 		gestCounter = 0
 
-	return gesture, gestCounter, myDroneIsTakeOff
+	return mode, gesture, gestCounter, myDroneIsTakeOff

@@ -1,12 +1,11 @@
 from utility import *
 from utility_gesture import  *
 import cv2
-from hand_detection import  *
-import handy
 
 
 myDrone = intializeTello()
 w, h = 360, 240
+c = [[0,0],0,0]
 pid = [0.5,0.5,0.5,0.5]
 pError = [0,0,0]
 pdirection = 'up'
@@ -15,9 +14,9 @@ findCounter = 0
 gestCounter = 0
 faceArea = w*h//16
 myDroneIsTakeOff = True
+mode = "tracking"
 
 myDrone.takeoff()
-#hist = handy.capture_histogram(myDrone, 0, w, h)
 print("My Battery: " + str(myDrone.get_battery()))
 
 while True:
@@ -26,21 +25,27 @@ while True:
 	img = telloGetFrame(myDrone, w, h)
 	## STEP 2
 	gesture = recogGest(img,w,h)
-	img, c = findFace(img)
-	#img = handDetection(img,hist)
+	if mode == "tracking":
+		img, c = findFace(img)
 	## STEP 3
 	print(gesture)
-	pGest,gestCounter, myDroneIsTakeOff= reactGest(myDrone, gesture, pGest, gestCounter, myDroneIsTakeOff)
+	mode,pGest,gestCounter,myDroneIsTakeOff= reactGest(myDrone, mode, gesture, pGest, gestCounter, myDroneIsTakeOff)
 	## STEP 4
-	if c[0][0] == 0 and c[1] == 0 and c[0][1] == 0 and findCounter > 100:
-		pdirection = searchFace(myDrone, pdirection)
-	else:
-		pError = trackFace(myDrone,c,w,h,faceArea,pid,pError)
-		#print(findCounter)
-		if c[0][0] == 0 and c[1] == 0 and c[0][1] == 0:
-			findCounter += 1
+	if mode == "tracking":
+		if c[0][0] == 0 and c[1] == 0 and c[0][1] == 0 and findCounter > 100:
+			pdirection = searchFace(myDrone, pdirection)
 		else:
-			findCounter = 0
+			pError = trackFace(myDrone,c,w,h,faceArea,pid,pError)
+			if c[0][0] == 0 and c[1] == 0 and c[0][1] == 0:
+				findCounter += 1
+			else:
+				findCounter = 0
+	elif mode == "wait":
+		pError = [0,0,0]
+		findCounter = 101
+		c = [[0,0],0,0]
+		_ = trackFace(myDrone,c,w,h,faceArea,pid,pError)
+
 	# DISPLAY IMAGE
 	#cv2.imshow("MyResult", img.outline)
 	cv2.imshow("MyResult", img)
