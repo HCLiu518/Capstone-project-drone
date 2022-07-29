@@ -1,4 +1,5 @@
 from utility import *
+from utility_gesture import  *
 import cv2
 from hand_detection import  *
 import handy
@@ -9,7 +10,9 @@ w, h = 360, 240
 pid = [0.5,0.5,0.5,0.5]
 pError = [0,0,0]
 pdirection = 'up'
+pGest = None
 findCounter = 0
+gestCounter = 0
 faceArea = w*h//16
 
 myDrone.takeoff()
@@ -21,9 +24,14 @@ while True:
 	## STEP 1
 	img = telloGetFrame(myDrone, w, h)
 	## STEP 2
+	gesture = recogGest(img,w,h)
 	img, c = findFace(img)
 	#img = handDetection(img,hist)
 	## STEP 3
+	print(gesture)
+	print(myDrone.get_height())
+	pGest,gestCounter = reactGest(myDrone, gesture, pGest, gestCounter)
+	## STEP 4
 	if c[0][0] == 0 and c[1] == 0 and c[0][1] == 0 and findCounter > 100:
 		pdirection = searchFace(myDrone, pdirection)
 	else:

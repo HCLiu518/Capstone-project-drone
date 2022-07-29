@@ -106,3 +106,21 @@ def searchFace(myDrone, direction='up'):
 	myDrone.send_rc_control(0,0, myDrone.up_down_velocity, myDrone.yaw_velocity)
 
 	return direction
+
+def reactGest(myDrone, gesture=None, pGest=None, gestCounter=0):
+	if not gesture:
+		return None, 0
+	if pGest == gesture:
+		if gestCounter >= 5:
+			if gesture=="stop":
+				myDrone.land()
+			if gesture=="fist":
+				myDrone.takeoff()
+			gestCounter = 0
+		else:
+			gestCounter += 1
+
+	else:
+		gestCounter = 0
+
+	return gesture, gestCounter
