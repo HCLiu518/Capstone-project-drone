@@ -11,7 +11,6 @@ def intializeTello():
 	myDrone.up_down_velocity = 0
 	myDrone.yaw_velocity = 0
 	myDrone.speed =0
-	print(myDrone.get_battery())
 	myDrone.streamoff()
 	myDrone.streamon()
 	return myDrone
@@ -95,7 +94,6 @@ def trackFace(myDrone,c,w,h,area,pid,pError):
 
 def searchFace(myDrone, direction='up'):
 	height = myDrone.get_height()
-	print(height)
 	if height <= 60:
 		direction = 'up'
 	elif height >= 160:
@@ -107,15 +105,19 @@ def searchFace(myDrone, direction='up'):
 
 	return direction
 
-def reactGest(myDrone, gesture=None, pGest=None, gestCounter=0):
+def reactGest(myDrone, gesture=None, pGest=None, gestCounter=0, myDroneIsTakeOff=True):
 	if not gesture:
-		return None, 0
+		return None, 0, myDroneIsTakeOff
 	if pGest == gesture:
 		if gestCounter >= 5:
-			if gesture=="stop":
+			if gesture=="stop" and myDroneIsTakeOff:
 				myDrone.land()
-			if gesture=="fist":
+				myDroneIsTakeOff = False
+			if (gesture=="fist" or gesture=='thumbs down') and not myDroneIsTakeOff:
 				myDrone.takeoff()
+				myDroneIsTakeOff = True
+			if gesture == "thumbs up" or gesture=="call me":
+				myDrone.flip_back()
 			gestCounter = 0
 		else:
 			gestCounter += 1
@@ -123,4 +125,4 @@ def reactGest(myDrone, gesture=None, pGest=None, gestCounter=0):
 	else:
 		gestCounter = 0
 
-	return gesture, gestCounter
+	return gesture, gestCounter, myDroneIsTakeOff

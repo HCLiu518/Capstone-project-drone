@@ -14,6 +14,7 @@ pGest = None
 findCounter = 0
 gestCounter = 0
 faceArea = w*h//16
+myDroneIsTakeOff = True
 
 myDrone.takeoff()
 #hist = handy.capture_histogram(myDrone, 0, w, h)
@@ -29,8 +30,7 @@ while True:
 	#img = handDetection(img,hist)
 	## STEP 3
 	print(gesture)
-	print(myDrone.get_height())
-	pGest,gestCounter = reactGest(myDrone, gesture, pGest, gestCounter)
+	pGest,gestCounter, myDroneIsTakeOff= reactGest(myDrone, gesture, pGest, gestCounter, myDroneIsTakeOff)
 	## STEP 4
 	if c[0][0] == 0 and c[1] == 0 and c[0][1] == 0 and findCounter > 100:
 		pdirection = searchFace(myDrone, pdirection)
