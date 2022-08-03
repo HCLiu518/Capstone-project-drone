@@ -118,6 +118,7 @@ def reactGest(myDrone, mode, gesture=None, pGest=None, gestCounter=0, myDroneIsT
 				myDroneIsTakeOff = True
 			elif (gesture == "thumbs up" or gesture=="call me") and myDroneIsTakeOff:
 				myDrone.flip_back()
+				### Recording Video ####
 			elif gesture == "live long" and myDroneIsTakeOff:
 				mode = "tracking"
 			elif gesture == "stop" and myDroneIsTakeOff:
