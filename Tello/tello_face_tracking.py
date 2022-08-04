@@ -1,6 +1,8 @@
 from utility import *
 from utility_gesture import  *
+from video_capture import *
 import cv2
+from threading import Thread
 
 
 myDrone = intializeTello()
@@ -15,6 +17,7 @@ gestCounter = 0
 faceArea = w*h//16
 myDroneIsTakeOff = True
 mode = "tracking"
+recorder = None
 
 myDrone.takeoff()
 print("My Battery: " + str(myDrone.get_battery()))
@@ -40,11 +43,21 @@ while True:
 				findCounter += 1
 			else:
 				findCounter = 0
+
 	elif mode == "wait":
 		pError = [0,0,0]
 		findCounter = 101
 		c = [[0,0],0,0]
 		_ = trackFace(myDrone,c,w,h,faceArea,pid,pError)
+
+	elif mode == "video":
+		pError = [0,0,0]
+		findCounter = 101
+		c = [[0,0],0,0]
+		_ = trackFace(myDrone,c,w,h,faceArea,pid,pError)
+		recorder = Thread(target=capture_video, args=(myDrone, img))
+		recorder.start()
+		mode = "wait"
 
 	# DISPLAY IMAGE
 	#cv2.imshow("MyResult", img.outline)
@@ -52,6 +65,7 @@ while True:
 	# WAIT FOR THE 'Q' BUTTON TO STOP
 	if cv2.waitKey(1) and 0xFF == ord('q'):
 		# replace the 'and' with '&amp;'  
+		recorder.join()
 		myDrone.land()
 		break
 	

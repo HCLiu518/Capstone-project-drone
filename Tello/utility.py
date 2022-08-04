@@ -110,19 +110,34 @@ def reactGest(myDrone, mode, gesture=None, pGest=None, gestCounter=0, myDroneIsT
 		return mode, None, 0, myDroneIsTakeOff
 	if pGest == gesture:
 		if gestCounter >= 5:
-			if gesture=="peace" and myDroneIsTakeOff:
+            
+
+            # 1) WAIT FOR A COMMAND
+			if gesture == "stop" and myDroneIsTakeOff:
+				mode = "wait"
+
+            # 2) LAND
+			elif gesture=="peace" and myDroneIsTakeOff:
 				myDrone.land()
 				myDroneIsTakeOff = False
+
+			# 3) TAKE OFF
 			elif (gesture=="fist" or gesture=='thumbs down') and not myDroneIsTakeOff:
 				myDrone.takeoff()
 				myDroneIsTakeOff = True
+
+			# 4) SHOW MY LOCATION
 			elif (gesture == "thumbs up" or gesture=="call me") and myDroneIsTakeOff:
 				myDrone.flip_back()
-				### Recording Video ####
+			
+			# 5) SEARCH OTHER VICTIMS 
 			elif gesture == "live long" and myDroneIsTakeOff:
 				mode = "tracking"
-			elif gesture == "stop" and myDroneIsTakeOff:
-				mode = "wait"
+
+			# 6) CAPTURE VIDEO AND SEND IT TO RESCUING TEAM
+			elif gesture == "smile":
+				mode = "video"
+				
 			gestCounter = 0
 		else:
 			gestCounter += 1
