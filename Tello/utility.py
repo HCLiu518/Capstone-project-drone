@@ -135,7 +135,7 @@ def reactGest(myDrone, mode, gesture=None, pGest=None, gestCounter=0, myDroneIsT
 				mode = "tracking"
 
 			# 6) CAPTURE VIDEO AND SEND IT TO RESCUING TEAM
-			elif gesture == "smile":
+			elif gesture == "okay":
 				mode = "video"
 				
 			gestCounter = 0

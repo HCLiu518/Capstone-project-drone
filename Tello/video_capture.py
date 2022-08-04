@@ -1,20 +1,19 @@
 import time
 import cv2
-from djitellopy import Tello
 from threading import Thread
-
+from utility import telloGetFrame
 
 def capture_video(myDrone, img, w=360, h=240):
 
 	keepRecording = True
-	myDrone.streamon()
+	#myDrone.streamon()
 
-    def video_recorder():
+	def video_recorder():
 
-    	video = cv2.VideoWriter('recording.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (w,h))
+		video = cv2.VideoWriter('recording.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (w,h))
 
 		while keepRecording:
-			video.write(img)
+			video.write(telloGetFrame(myDrone))
 			time.sleep(1 / 30)
 
 		video.release()
