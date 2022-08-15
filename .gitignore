@@ -1,5 +1,4 @@
-.avi
-.iclould
+*.avi
+*.iclould
 .DS_Store
-.recording.avi.icloud
-outputs
+*.recording.avi.icloud

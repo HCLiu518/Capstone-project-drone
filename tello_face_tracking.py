@@ -4,7 +4,6 @@ from util.video_capture import *
 import cv2
 from threading import Thread
 
-
 myDrone = intializeTello()
 w, h = 360, 240
 c = [[0,0],0,0]

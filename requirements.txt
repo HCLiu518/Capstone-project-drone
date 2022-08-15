@@ -1,0 +1,7 @@
+numpy
+mediapipe
+tensorflow
+opencv-python
+face_recognition
+djitellopy
+pygame
