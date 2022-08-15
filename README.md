@@ -16,6 +16,8 @@ pip install -r requirements.txt
 
 ## Usage
 
+First, connecting the Tello Drone to pc via wifi.
+
 ### Feature 1.1 Recognizing & following faces
 
 ```bash
