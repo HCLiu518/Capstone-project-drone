@@ -30,10 +30,13 @@ recorder = None
 
 ## Take off the drone
 myDrone.takeoff()
-#start_time = time.perf_counter()
-myDrone.move_up(150)
+start_time = time.perf_counter()
+myDrone.move_up(100)
 
 while True:
+	if cv2.waitKey(1) == ord('k'):
+		start_time = time.perf_counter()
+		print(start_time)
 	#duration = time.perf_counter() - start_time
 	#timeList.append(duration)
 	#speedList.append(speed[2])
@@ -46,7 +49,9 @@ while True:
 		img, c = findFace(img)
 	## STEP 3: handle the response of gesture
 	print(gesture)
-	mode,pGest,gestCounter,myDroneIsTakeOff= reactGest(myDrone, mode, gesture, pGest, gestCounter, myDroneIsTakeOff)
+	mode,pGest,gestCounter,myDroneIsTakeOff,activate= reactGest(myDrone, mode, gesture, pGest, gestCounter, myDroneIsTakeOff)
+	if activate:
+		print(f"The response time is {time.perf_counter()-start_time}")
 	## STEP 4:
 	### Tracking mode: track the biggest face and search for one if there is not any face after 100 counts.
 	### Wait mode: stand still and only do recognizing gesture

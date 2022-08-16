@@ -121,13 +121,14 @@ def searchFace(myDrone, direction='up'):
 	return direction
 
 def reactGest(myDrone, mode, gesture=None, pGest=None, gestCounter=0, myDroneIsTakeOff=True):
+	activate = False
 	# Respond to different gesture inputs
 	if not gesture:
-		return mode, None, 0, myDroneIsTakeOff
+		return mode, None, 0, myDroneIsTakeOff, activate
 	## Respond after recognizing the same gesture 5 times
 	if pGest == gesture:
 		if gestCounter >= 5:
-            
+			activate = True
 
             # 1) WAIT FOR A COMMAND
 			if gesture == "stop" and myDroneIsTakeOff:
@@ -145,8 +146,7 @@ def reactGest(myDrone, mode, gesture=None, pGest=None, gestCounter=0, myDroneIsT
 
 			# 4) SHOW MY LOCATION
 			elif (gesture == "thumbs up" or gesture=="call me") and myDroneIsTakeOff:
-				pass
-				#myDrone.flip_back()
+				myDrone.flip_back()
 			
 			# 5) SEARCH OTHER VICTIMS 
 			elif gesture == "live long" and myDroneIsTakeOff:
@@ -163,4 +163,4 @@ def reactGest(myDrone, mode, gesture=None, pGest=None, gestCounter=0, myDroneIsT
 	else:
 		gestCounter = 0
 
-	return mode, gesture, gestCounter, myDroneIsTakeOff
+	return mode, gesture, gestCounter, myDroneIsTakeOff, activate
