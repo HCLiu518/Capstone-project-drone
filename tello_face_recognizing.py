@@ -1,35 +1,33 @@
 from util.utility import *
 from util.utility_recognition import *
-
 import cv2
 
-
-
+## Initiate the drone
 myDrone = intializeTello()
-w, h = 360, 240
-c = [[0,0],0,0]
-pid = [0.5,0.5,0.5,0.5]
-pError = [0,0,0]
+
+## Setup parameters
+w, h = 360, 240 # width and height of capture images
+c = [[0,0],0,0] # parameter of faces
+pid = [0.5,0.5,0.5,0.5] # PID
+pError = [0,0,0] # previous error of PID
 faceArea = w*h//16
 
-
+## Take off the drone
 myDrone.takeoff()
-print("My Battery: " + str(myDrone.get_battery()))
 
 while True:
 
-	## STEP 1
+	## STEP 1: get a image from the drone
 	img = telloGetFrame(myDrone, w, h)
-	## STEP 2
+	## STEP 2: Recogize people and send back whether it is person of interest or not.
 	img, c = recognition(img, "Hung-Chih Liu")
-	## STEP 3
+	## STEP 3: if it is person of interest, then the drone track the person.
 	pError = trackFace(myDrone,c,w,h,faceArea,pid,pError)
 
-	# DISPLAY IMAGE
+	## display image
 	cv2.imshow("MyResult", img)
 	# WAIT FOR THE 'Q' BUTTON TO STOP
 	if cv2.waitKey(1) and 0xFF == ord('q'):
-		# replace the 'and' with '&amp;'  
 		myDrone.land()
 		break
 	

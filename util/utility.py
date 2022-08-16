@@ -3,26 +3,31 @@ import cv2
 import numpy as np
 
 def intializeTello():
-	# CONNECT TO TELLO
+	# Connect to the Tello Drone
 	myDrone = Tello()
 	myDrone.connect()
+	# Setup init status
 	myDrone.for_back_velocity = 0
 	myDrone.left_right_velocity = 0
 	myDrone.up_down_velocity = 0
 	myDrone.yaw_velocity = 0
 	myDrone.speed =0
+	# Print battery level
+	print("My Battery: " + str(myDrone.get_battery()))
+	# Checkout stream
 	myDrone.streamoff()
 	myDrone.streamon()
 	return myDrone
 
 def telloGetFrame(myDrone,w=360,h=240):
-	# GET THE IMGAE FROM TELLO
+	# Get the image from the drone
 	myFrame = myDrone.get_frame_read()
 	myFrame = myFrame.frame
 	img = cv2.resize(myFrame, (w, h))
 	return img
 
 def findFace(img):
+	# Use existed classisfier for recognizing faces
 	faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 	imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	faces, rejectLevels, levelWeights = faceCascade.detectMultiScale3(imgGray, 1.1, 4, outputRejectLevels=True)
@@ -31,6 +36,7 @@ def findFace(img):
 	myFaceListArea = []
 	myFaceConf = []
 
+	# Append all faces into lists
 	for ((x, y, w, h), _, lw) in zip(faces, rejectLevels, levelWeights):
 		cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
 		cx = x + w//2
@@ -41,6 +47,7 @@ def findFace(img):
 		myFaceConf.append(lw)
 		#print(area)
 
+	# Find the biggest face
 	if len(myFaceListArea) != 0:
 		i = myFaceListArea.index(max(myFaceListArea))
 		# index of closest face
@@ -49,7 +56,7 @@ def findFace(img):
 		return img, [[0,0],0,0]
 
 def trackFace(myDrone,c,w,h,area,pid,pError):
-	#print(c)
+	# Track the given face
 	## Rotation
 	error_rotation= (c[0][0] - w//2)
 	speed_rotation = pid[0]*error_rotation + pid[1] * (error_rotation-pError[0])
@@ -85,7 +92,7 @@ def trackFace(myDrone,c,w,h,area,pid,pError):
 		error_distance = 0
 		error_height = 0
 
-	# SEND VELOCITY VALUES TO TELLO
+	# Send velocity values to the drone
 	if myDrone.send_rc_control:
 		myDrone.send_rc_control(myDrone.left_right_velocity,myDrone.for_back_velocity,
 		myDrone.up_down_velocity, myDrone.yaw_velocity)
@@ -93,12 +100,13 @@ def trackFace(myDrone,c,w,h,area,pid,pError):
 	return [error_rotation, error_distance, error_height]
 
 def searchFace(myDrone, direction='up'):
+	# Search a face
 	height = myDrone.get_height()
 	if height <= 60:
 		direction = 'up'
 	elif height >= 160:
 		direction = 'down'
-	
+	# Move up and down and rotate in place
 	myDrone.up_down_velocity = 50 if direction=='up' else -50
 	myDrone.yaw_velocity = 30
 	myDrone.send_rc_control(0,0, myDrone.up_down_velocity, myDrone.yaw_velocity)
@@ -106,8 +114,10 @@ def searchFace(myDrone, direction='up'):
 	return direction
 
 def reactGest(myDrone, mode, gesture=None, pGest=None, gestCounter=0, myDroneIsTakeOff=True):
+	# Respond to different gesture inputs
 	if not gesture:
 		return mode, None, 0, myDroneIsTakeOff
+	## Respond after recognizing the same gesture 5 times
 	if pGest == gesture:
 		if gestCounter >= 5:
             

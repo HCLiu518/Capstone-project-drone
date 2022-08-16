@@ -1,3 +1,4 @@
+#Credit: face_recognition
 import face_recognition
 import cv2
 import numpy as np
@@ -88,7 +89,8 @@ def recognition(frame, person_of_interest):
         bottom = int(bottom)
         left = int(left)
         color = (150,150,150)
-
+        
+        # Save info of person of interest
         if name == person_of_interest:
             poi_info[0][0] = (left + right)//2
             poi_info[0][1] = (top + bottom)//2
