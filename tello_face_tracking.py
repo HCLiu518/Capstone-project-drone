@@ -3,6 +3,9 @@ from util.utility_gesture import  *
 from util.video_capture import *
 import cv2
 from threading import Thread
+import time
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 ## Initiate the drone
 myDrone = intializeTello()
@@ -10,7 +13,7 @@ myDrone = intializeTello()
 ## Setup parameters
 w, h = 360, 240 # width and height of capture images
 c = [[0,0],0,0] # parameter of faces
-pid = [0.5,0.5,0.5,0.5] # PID
+pid = [[0.3,0.3,0],[0.5,0.5,0],[0.5,0.5,0]] # 3 PID controllers, one for rotation, one for for-back, one for up-down
 pError = [0,0,0] # previous error of PID
 pdirection = 'up' # previous direction of searching face
 pGest = None # previous gesture of gesture recognition
@@ -21,11 +24,20 @@ myDroneIsTakeOff = True
 mode = "tracking" # three modes: tracking, wait, video
 recorder = None
 
+#timeList = []
+#speedList = []
+#speed = [0,0,0]
+
 ## Take off the drone
 myDrone.takeoff()
+#start_time = time.perf_counter()
+myDrone.move_up(150)
 
 while True:
-
+	#duration = time.perf_counter() - start_time
+	#timeList.append(duration)
+	#speedList.append(speed[2])
+	#speed = [0,0,0]
 	## STEP 1: get a image from the drone
 	img = telloGetFrame(myDrone, w, h)
 	## STEP 2: recognize the gesture and faces if in the tracking mode
@@ -43,7 +55,7 @@ while True:
 		if c[0][0] == 0 and c[1] == 0 and c[0][1] == 0 and findCounter > 100:
 			pdirection = searchFace(myDrone, pdirection)
 		else:
-			pError = trackFace(myDrone,c,w,h,faceArea,pid,pError)
+			pError, speed = trackFace(myDrone,c,w,h,faceArea,pid,pError)
 			if c[0][0] == 0 and c[1] == 0 and c[0][1] == 0:
 				findCounter += 1
 			else:
@@ -53,13 +65,13 @@ while True:
 		pError = [0,0,0]
 		findCounter = 101
 		c = [[0,0],0,0]
-		_ = trackFace(myDrone,c,w,h,faceArea,pid,pError)
+		_, __ = trackFace(myDrone,c,w,h,faceArea,pid,pError)
 
 	elif mode == "video":
 		pError = [0,0,0]
 		findCounter = 101
 		c = [[0,0],0,0]
-		_ = trackFace(myDrone,c,w,h,faceArea,pid,pError)
+		_, __ = trackFace(myDrone,c,w,h,faceArea,pid,pError)
 		recorder = Thread(target=capture_video, args=(myDrone, img))
 		recorder.start()
 		mode = "wait"
@@ -67,8 +79,28 @@ while True:
 	## Displat image
 	cv2.imshow("MyResult", img)
 	# WAIT FOR THE 'Q' BUTTON TO STOP
-	if cv2.waitKey(1) and 0xFF == ord('q'):
-		recorder.join()
+	if cv2.waitKey(1) == ord('q'):
+		#recorder.join()
 		myDrone.land()
 		break
 	
+	
+
+	#print(f"Duration of one cycle: {duration:0.4f}")
+#plt.plot(timeList,speedList,label='PID = [0.65,0.65,0]',color="blue")
+#plt.xlabel('Time')
+#plt.ylabel('Speed of distance')
+#plt.legend()
+#plt.show()
+
+#plt.plot(timeList,speedList,label='PID = [0.65,0.65,0]',color="red")
+#plt.xlabel('Time')
+#plt.ylabel('Speed of rotation')
+#plt.legend()
+#plt.show()
+
+#plt.plot(timeList,speedList,label='PID = [1.0,1.0,0]',color="black")
+#plt.xlabel('Time')
+#plt.ylabel('Speed of height')
+#plt.legend()
+#plt.show()

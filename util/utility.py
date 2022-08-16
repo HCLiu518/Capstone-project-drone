@@ -57,15 +57,19 @@ def findFace(img):
 
 def trackFace(myDrone,c,w,h,area,pid,pError):
 	# Track the given face
+	speed_distance = 0
 	## Rotation
-	error_rotation= (c[0][0] - w//2)
-	speed_rotation = pid[0]*error_rotation + pid[1] * (error_rotation-pError[0])
-	speed_rotation = int(np.clip(speed_rotation, -100, 100))
+	error_rotation = (c[0][0] - w//2)
+	if c[0][0] != 0:
+		speed_rotation = pid[0][0]*error_rotation + pid[0][1] * (error_rotation-pError[0])
+		speed_rotation = int(np.clip(speed_rotation, -100, 100))
+	else:
+		speed_rotation = 0
 
 	## Distance
-	if abs(c[1] - area) >= area//2:
+	if abs(c[1] - area) >= area//2 and c[0][0] != 0:
 		error_distance= (abs(c[1] - area))**0.5
-		speed_distance = pid[2]*error_distance + pid[3] * (error_distance-pError[1])
+		speed_distance = pid[1][0]*error_distance + pid[1][1] * (error_distance-pError[1])
 		if c[1] - area >= 0:
 			speed_distance = -int(np.clip(speed_distance, -50, 50))
 		else:
@@ -76,8 +80,11 @@ def trackFace(myDrone,c,w,h,area,pid,pError):
 
 	## Height
 	error_height= (c[0][1] - h//2)
-	speed_height = pid[0]*error_height + pid[1] * (error_height-pError[2])
-	speed_height = -int(np.clip(speed_height, -100, 100))
+	if c[0][0] != 0:
+		speed_height = pid[2][0]*error_height + pid[2][1] * (error_height-pError[2])
+		speed_height = -int(np.clip(speed_height, -100, 100))
+	else:
+		speed_height = 0
 
 	if c[0][0] != 0 and c[1] != 0 and c[0][1] != 0 and c[2] > 3.5:
 		myDrone.yaw_velocity = speed_rotation
@@ -97,7 +104,7 @@ def trackFace(myDrone,c,w,h,area,pid,pError):
 		myDrone.send_rc_control(myDrone.left_right_velocity,myDrone.for_back_velocity,
 		myDrone.up_down_velocity, myDrone.yaw_velocity)
 
-	return [error_rotation, error_distance, error_height]
+	return [error_rotation, error_distance, error_height], [speed_rotation, speed_distance, speed_height]
 
 def searchFace(myDrone, direction='up'):
 	# Search a face
@@ -138,7 +145,8 @@ def reactGest(myDrone, mode, gesture=None, pGest=None, gestCounter=0, myDroneIsT
 
 			# 4) SHOW MY LOCATION
 			elif (gesture == "thumbs up" or gesture=="call me") and myDroneIsTakeOff:
-				myDrone.flip_back()
+				pass
+				#myDrone.flip_back()
 			
 			# 5) SEARCH OTHER VICTIMS 
 			elif gesture == "live long" and myDroneIsTakeOff:
