@@ -56,8 +56,8 @@ while True:
 	## STEP 3: handle the response of gesture
 	print(gesture)
 	mode,pGest,gestCounter,myDroneIsTakeOff,activate= reactGest(myDrone, mode, gesture, pGest, gestCounter, myDroneIsTakeOff)
-	if activate:
-		print(f"The response time is {time.perf_counter()-start_time}")
+	#if activate:
+		#print(f"The response time is {time.perf_counter()-start_time}")
 	## STEP 4:
 	### Tracking mode: track the biggest face and search for one if there is not any face after 100 counts.
 	### Wait mode: stand still and only do recognizing gesture
