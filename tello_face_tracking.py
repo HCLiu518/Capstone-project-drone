@@ -1,3 +1,4 @@
+from typing import Counter
 from util.utility import *
 from util.utility_gesture import  *
 from util.video_capture import *
@@ -23,6 +24,8 @@ faceArea = w*h//16
 myDroneIsTakeOff = True
 mode = "tracking" # three modes: tracking, wait, video
 recorder = None
+#counterCycles = 0
+#counterDetection = 0
 
 #timeList = []
 #speedList = []
@@ -30,13 +33,16 @@ recorder = None
 
 ## Take off the drone
 myDrone.takeoff()
-start_time = time.perf_counter()
+#start_time = time.perf_counter()
 myDrone.move_up(100)
 
 while True:
-	if cv2.waitKey(1) == ord('k'):
-		start_time = time.perf_counter()
-		print(start_time)
+
+	#counterCycles += 1
+
+	#if cv2.waitKey(1) == ord('k'):
+		#start_time = time.perf_counter()
+		#print(start_time)
 	#duration = time.perf_counter() - start_time
 	#timeList.append(duration)
 	#speedList.append(speed[2])
@@ -64,6 +70,7 @@ while True:
 			if c[0][0] == 0 and c[1] == 0 and c[0][1] == 0:
 				findCounter += 1
 			else:
+				#counterDetection += 1
 				findCounter = 0
 
 	elif mode == "wait":
@@ -89,7 +96,8 @@ while True:
 		myDrone.land()
 		break
 	
-	
+	#print("Cycle counter: ", str(counterCycles))
+	#print("Detection counter: ", str(counterDetection))
 
 	#print(f"Duration of one cycle: {duration:0.4f}")
 #plt.plot(timeList,speedList,label='PID = [0.65,0.65,0]',color="blue")
