@@ -14,7 +14,7 @@ import numpy as np
 
 # Get a reference to webcam #0 (the default one)
 
-matthew_image = face_recognition.load_image_file("photo/Matthew.jpg")
+matthew_image = face_recognition.load_image_file("photo/Volunteer.jpg")
 matthew_face_encoding = face_recognition.face_encodings(matthew_image)[0]
 
 ryan_image = face_recognition.load_image_file("photo/ryan.jpeg")
@@ -30,7 +30,7 @@ known_face_encodings = [
     andrea_face_encoding
 ]
 known_face_names = [
-    "Hung-Chih Liu",
+    "Volunteer",
     "Ryan Rivera",
     "Andrea Casassa Sian"
 ]
@@ -103,6 +103,6 @@ def recognition(frame, person_of_interest):
         # Draw a label with a name below the face
         cv2.rectangle(frame, (left, bottom - 10), (right, bottom), color, cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.3, (255, 255, 255), 1)
+        cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.6, (255, 255, 255), 1)
 
     return frame, poi_info
