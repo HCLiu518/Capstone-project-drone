@@ -16,8 +16,8 @@ faceArea = w*h//16
 #counterDetection = 0
 
 ## Take off the drone
-#myDrone.takeoff()
-#myDrone.move_up(100)
+myDrone.takeoff()
+myDrone.move_up(100)
 
 while True:
 	#counterCycles += 1
